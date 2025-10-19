@@ -2,7 +2,20 @@
 
 A simple command-line application written in Rust to create a "sticky frame" or "burn-in" motion trail effect on videos. It works by comparing consecutive frames and leaving a trail for pixels that change significantly.
 
-![Demo GIF](https://place-hold.it/700x400?text=Add+a+demo.gif+here)
+### Demo
+| Before | After |
+| :----: | :---: |
+| [![Before](assets/before.png)](assets/demo_input.mp4) | [![After](assets/after.png)](assets/demo_output.mp4) |
+| *Click to play original video* | *Click to play processed video*|
+
+Settings used for Demo:
+```rust
+let burn_in_factor: f32 = 0.4;
+let diff_r_threshold_percent: f32 = 0.1;
+let diff_g_threshold_percent: f32 = 0.1;
+let diff_b_threshold_percent: f32 = 0.1;
+let preserve_audio: bool = true;
+```
 
 ## Features
 
@@ -22,7 +35,7 @@ Before running this project, you must have the following installed:
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/BlankyWacky/sticky_frame
     cd sticky_frame
     ```
 

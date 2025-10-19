@@ -12,10 +12,10 @@ use video_rs::{
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Effect Settings
-    let burn_in_factor: f32 = 1.0;
-    let diff_r_threshold_percent: f32 = 0.4;
-    let diff_g_threshold_percent: f32 = 0.4;
-    let diff_b_threshold_percent: f32 = 0.4;
+    let burn_in_factor: f32 = 0.4;
+    let diff_r_threshold_percent: f32 = 0.1;
+    let diff_g_threshold_percent: f32 = 0.1;
+    let diff_b_threshold_percent: f32 = 0.1;
     let preserve_audio: bool = true;
 
     // Init
