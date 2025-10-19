@@ -5,8 +5,7 @@ A simple command-line application written in Rust to create a "sticky frame" or 
 ### Demo
 | Before | After |
 | :----: | :---: |
-| [![Before](assets/before.png)](assets/demo_input.mp4) | [![After](assets/after.png)](assets/demo_output.mp4) |
-| *Click to play original video* | *Click to play processed video*|
+| ![Before](assets/demo_input.gif) | ![After](assets/demo_output.gif) |
 
 Settings used for Demo:
 ```rust
