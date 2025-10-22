@@ -6,7 +6,7 @@ use indicatif::{
     ProgressBar,
     ProgressStyle,
 };
-use log::info;
+use log::{error, info};
 use std::{
     fs,
     path::Path,
@@ -47,10 +47,16 @@ use crate::video_processors::{
 mod video_processors;
 
 fn main() {
+
+    // Initialize logger
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
+        .format_timestamp(None)
+        .init();
+    
     // Effect Settings
     let settings = EffectSettings {
         // General
-        mode: EffectMode::Colored,
+        mode: EffectMode::Priority,
         preserve_audio: true,
         motion_threshold_percent: 0.1,
         use_edge_correction: false,
@@ -58,29 +64,29 @@ fn main() {
 
         // Mode-Specific
         stable: StableSettings {
-            burn_in_factor: 0.8,
-            tracer_duration_ms: Some(3000),
+            burn_in_factor: 1.0,
+            tracer_duration_ms: None,
         },
         blended: BlendedSettings {
             blend_factor: 0.5,
-            tracer_duration_ms: Some(10000),
+            tracer_duration_ms: Some(5000),
         },
         colored: ColoredSettings {
             color: image::Rgba([255, 255, 255, 255]),
             rainbow_mode: true,
             rainbow_speed: 5.0,
             tracer_opacity: 1.0,
-            tracer_duration_ms: Some(4000),
+            tracer_duration_ms: Some(5000),
         },
         priority: PrioritySettings {
             mode: PriorityMode::Lightest,
-            tracer_duration_ms: Some(2000),
+            tracer_duration_ms: Some(5000),
         },
     };
 
     // Init video-rs
     if let Err(e) = video_rs::init() {
-        eprintln!("Failed to initialize video_rs: {}", e);
+        error!("Failed to initialize video_rs: {}", e);
         return;
     }
 
@@ -92,12 +98,12 @@ fn main() {
     // This block handles the decoding, encoding and processing, needs to be in a separate scope for audio handling later.
     if let Err(e) = (|| -> Result<(), Box<dyn std::error::Error>> {
         // Decoding
-        println!("Opening decoder for: {}", source_path.display());
+        info!("Opening decoder for: {}", source_path.display());
         let mut decoder = DecoderBuilder::new(source_path).build()?;
         let (width, height) = decoder.size();
         let frame_rate = decoder.frame_rate();
         let total_frames = decoder.frames()?;
-        println!("Video properties: {}x{} @ {} fps", width, height, frame_rate);
+        info!("Video properties: {}x{} @ {} fps", width, height, frame_rate);
 
         // Calculate the per-frame decay amount for each effect mode based on the configured duration.
         let decay = CalculatedDecay {
@@ -202,7 +208,7 @@ fn main() {
         pb.finish_with_message("Video processing complete.");
         Ok(())
     })() { // Execute the closure
-        eprintln!("An error occurred during video processing: {}", e);
+        error!("An error occurred during video processing: {}", e);
         return;
     }
 
@@ -231,20 +237,20 @@ fn main() {
             Ok(s) if s.success() => {
                 // Clean up the temporary video file
                 if let Err(e) = fs::remove_file(temp_video_path) {
-                    eprintln!("Failed to remove temporary file: {}", e);
+                    error!("Failed to remove temporary file: {}", e);
                 }
             }
             _ => {
-                eprintln!("FFmpeg command failed. The video was saved without audio.");
+                error!("FFmpeg command failed. The video was saved without audio.");
                 if let Err(e) = fs::rename(temp_video_path, final_output_path) {
-                    eprintln!("Failed to rename temporary file: {}", e);
+                    error!("Failed to rename temporary file: {}", e);
                 }
             }
         }
     } else {
         // No audio preservation, just rename the temp file to final output
         if let Err(e) = fs::rename(temp_video_path, final_output_path) {
-            eprintln!("Failed to rename temporary file: {}", e);
+            error!("Failed to rename temporary file: {}", e);
         }
     }
 

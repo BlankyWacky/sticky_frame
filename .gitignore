@@ -3,4 +3,5 @@ Cargo.lock
 .vscode/
 input.mp4
 output.mp4
+temp_output.mp4
 *.zip
